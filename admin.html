@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Admin Chat</title>
+
+<style>
+
+body{
+background:#111;
+color:white;
+font-family:sans-serif;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.chat{
+width:400px;
+height:90vh;
+background:#1c1c1c;
+border-radius:20px;
+display:flex;
+flex-direction:column;
+overflow:hidden;
+}
+
+.header{
+padding:15px;
+background:#00a884;
+font-weight:bold;
+text-align:center;
+}
+
+.messages{
+flex:1;
+padding:15px;
+overflow:auto;
+}
+
+.msg{
+background:#00a884;
+padding:10px;
+border-radius:10px;
+margin-bottom:10px;
+}
+
+.input{
+display:flex;
+padding:10px;
+background:#222;
+}
+
+.input input{
+flex:1;
+padding:10px;
+border:none;
+outline:none;
+border-radius:10px;
+}
+
+.input button{
+margin-left:10px;
+padding:10px;
+border:none;
+background:#00a884;
+color:white;
+border-radius:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="chat">
+
+<div class="header">
+ADMIN PANEL
+</div>
+
+<div id="messages" class="messages"></div>
+
+<div class="input">
+
+<input type="text" id="msg">
+
+<button onclick="sendMessage()">
+Send
+</button>
+
+</div>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+
+const socket = io();
+
+socket.emit("admin-join");
+
+const messages = document.getElementById("messages");
+
+function addMessage(text){
+
+messages.innerHTML += `
+<div class="msg">${text}</div>
+`;
+
+messages.scrollTop = messages.scrollHeight;
+
+}
+
+function sendMessage(){
+
+const input = document.getElementById("msg");
+
+if(input.value=="") return;
+
+socket.emit("admin-message",input.value);
+
+addMessage("You: "+input.value);
+
+input.value="";
+
+}
+
+socket.on("receive-message",(data)=>{
+
+addMessage(data.sender+": "+data.text);
+
+});
+
+</script>
+
+</body>
+</html>
