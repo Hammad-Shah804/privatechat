@@ -1,34 +1,112 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Private Chat</title>
 
 <style>
 
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial, sans-serif;
+}
+
 body{
-background:#111;
+background:#0f0f0f;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
 color:white;
-font-family:sans-serif;
-padding:20px;
 }
 
-#messages{
-height:400px;
-border:1px solid white;
-overflow:auto;
-padding:10px;
-margin-bottom:10px;
+.chat-container{
+width:100%;
+max-width:420px;
+height:90vh;
+background:#1a1a1a;
+border-radius:15px;
+display:flex;
+flex-direction:column;
+overflow:hidden;
+box-shadow:0 0 20px rgba(0,0,0,0.6);
 }
 
-input{
-width:70%;
-padding:10px;
+/* Header */
+.header{
+background:#111;
+padding:15px;
+text-align:center;
+font-weight:bold;
+border-bottom:1px solid #333;
 }
 
-button{
+/* Messages */
+.messages{
+flex:1;
+padding:15px;
+overflow-y:auto;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.msg{
+max-width:75%;
+padding:10px 12px;
+border-radius:12px;
+font-size:14px;
+word-wrap:break-word;
+}
+
+.me{
+background:#00a884;
+align-self:flex-end;
+border-bottom-right-radius:3px;
+}
+
+.friend{
+background:#2a2a2a;
+align-self:flex-start;
+border-bottom-left-radius:3px;
+}
+
+/* Input area */
+.input-box{
+display:flex;
 padding:10px;
+background:#111;
+border-top:1px solid #333;
+}
+
+.input-box input{
+flex:1;
+padding:10px;
+border:none;
+border-radius:8px;
+outline:none;
+background:#222;
+color:white;
+}
+
+.input-box button{
+margin-left:10px;
+padding:10px 15px;
+border:none;
+background:#00a884;
+color:white;
+border-radius:8px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.input-box button:hover{
+background:#01916f;
 }
 
 </style>
@@ -37,15 +115,20 @@ padding:10px;
 
 <body>
 
-<h2>Private Chat</h2>
+<div class="chat-container">
 
-<div id="messages"></div>
+<div class="header">
+Private Chat System
+</div>
 
-<input type="text" id="msg">
+<div id="messages" class="messages"></div>
 
-<button onclick="sendMessage()">
-Send
-</button>
+<div class="input-box">
+<input type="text" id="msg" placeholder="Type message...">
+<button onclick="sendMessage()">Send</button>
+</div>
+
+</div>
 
 <script src="/socket.io/socket.io.js"></script>
 
@@ -59,19 +142,25 @@ function sendMessage(){
 
 const input = document.getElementById("msg");
 
+if(input.value.trim() === "") return;
+
 socket.emit("message", input.value);
 
-messages.innerHTML +=
-"<p><b>You:</b> " + input.value + "</p>";
+// My message
+messages.innerHTML += `<div class="msg me">${input.value}</div>`;
+
+messages.scrollTop = messages.scrollHeight;
 
 input.value = "";
 
 }
 
+// Friend message
 socket.on("message", (msg)=>{
 
-messages.innerHTML +=
-"<p><b>Friend:</b> " + msg + "</p>";
+messages.innerHTML += `<div class="msg friend">${msg}</div>`;
+
+messages.scrollTop = messages.scrollHeight;
 
 });
 
